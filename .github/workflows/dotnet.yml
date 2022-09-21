@@ -1,0 +1,31 @@
+name: .NET
+
+on:
+  push:
+    branches: 
+    - '**'
+  pull_request:
+    branches: 
+    - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Dotnet restore
+        run: for f in $(find . -name "*.sln"); do dotnet restore $f; done
+
+      - name: Build with dotnet
+        run: for f in $(find . -name "*.sln"); do dotnet build --no-restore $f; done
+
+      - name: Run unit tests
+        run: for f in $(find . -name "*.sln"); do dotnet test --no-build $f; done
