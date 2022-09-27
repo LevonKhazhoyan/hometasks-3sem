@@ -75,6 +75,7 @@ public class Tests
         for (var i = 0; i < 100; i++)
         {
             Assert.That(lazy.Get(), Is.EqualTo(1));
+            
         }
     }
     
