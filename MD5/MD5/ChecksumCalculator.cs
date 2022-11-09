@@ -1,8 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿namespace MD5;
+
+using System.Collections.Concurrent;
 using System.Text;
-
-namespace MD5;
-
 using System.Security.Cryptography;
 
 /// <summary>
@@ -47,7 +46,7 @@ public abstract class ChecksumCalculator
     /// </summary>
     /// <param name="path">Path to directory</param>
     /// <returns>IEnumerable of items</returns>
-    protected static IEnumerable<string> GetAllDirectoryItems(string path)
+    public static IEnumerable<string> GetAllDirectoryItems(string path)
     {
         var files = Directory.GetFiles(path);
         var directories = Directory.GetDirectories(path);
