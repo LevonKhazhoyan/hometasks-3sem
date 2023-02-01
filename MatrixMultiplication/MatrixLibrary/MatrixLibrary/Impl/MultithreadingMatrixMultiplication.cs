@@ -1,5 +1,8 @@
-﻿namespace MatrixLibrary.impl;
+﻿namespace MatrixLibrary.Impl;
 
+/// <summary>
+/// Multi-threaded realisation of <see cref="IMatrixMultiplication"/> interface
+/// </summary>
 public class ParallelMatrixMatrixMultiplication : IMatrixMultiplication
 {   
     /// <summary>

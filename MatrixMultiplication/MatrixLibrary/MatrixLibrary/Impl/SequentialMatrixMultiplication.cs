@@ -1,4 +1,4 @@
-﻿namespace MatrixLibrary.impl;
+﻿namespace MatrixLibrary.Impl;
 
 /// <summary>
 /// Sequential multiplication strategy.

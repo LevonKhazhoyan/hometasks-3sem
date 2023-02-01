@@ -45,14 +45,14 @@ public class Matrix
     public Matrix Multiply(Matrix second, IMatrixMultiplication strategy)
         => strategy.Multiply(this, second);
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        if (obj.GetType() != GetType())
+        if (obj == null || obj.GetType() != GetType())
         {
             return false;
         }
 
-        var right = (Matrix) obj;
+        var right = (Matrix)obj;
 
         if (ColNumber != right.ColNumber || RowNumber != right.RowNumber)
         {
@@ -73,8 +73,6 @@ public class Matrix
         return true;
     }
 
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(_content, ColNumber, RowNumber);
-    }
+    public override int GetHashCode() 
+        => HashCode.Combine(_content, ColNumber, RowNumber);
 }

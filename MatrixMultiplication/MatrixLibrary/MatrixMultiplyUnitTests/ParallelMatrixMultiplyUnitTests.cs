@@ -1,11 +1,8 @@
-using MatrixLibrary;
-using MatrixLibrary.impl;
-
 namespace MatrixMultiplyUnitTests;
 
-using System;
-using System.IO;
+using MatrixLibrary;
 using NUnit.Framework;
+using MatrixLibrary.Impl;
 
 public class Tests
 {

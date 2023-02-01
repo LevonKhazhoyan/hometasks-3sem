@@ -1,6 +1,6 @@
-﻿using System.Text;
+﻿namespace MatrixLibrary;
 
-namespace MatrixLibrary;
+using System.Text;
 
 /// <summary>
 /// Provides functions to I/O generate Matrix e.t.c. 
@@ -21,7 +21,7 @@ public static class Utils
         {
             for (var j = 0; j < cols; j++)
             {
-                text = text.Append(array[i, j] + " ");
+                text = text.Append(array[i, j]).Append(' ');
             }
 
             text = text.Replace(" ", "\n", text.Length - 1, 1);
