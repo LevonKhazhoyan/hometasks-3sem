@@ -5,15 +5,15 @@
 /// </summary>
 public class Matrix
 {
-    private readonly long[,] _content;
+    private readonly long[,] content;
 
     public int RowNumber { get; } 
     public int ColNumber { get; } 
 
     public long this[int i, int j]
     {
-        get => _content[i, j];
-        set => _content[i, j] = value;
+        get => content[i, j];
+        set => content[i, j] = value;
     }
 
     public Matrix(int rows, int cols)
@@ -23,14 +23,14 @@ public class Matrix
             throw new ArgumentOutOfRangeException();
         }
 
-        _content = new long[rows, cols];
+        content = new long[rows, cols];
         RowNumber = rows;
         ColNumber = cols;
     }
 
     public Matrix(long[,] array)
     {
-        _content = array;
+        content = array;
         RowNumber = array.GetLength(0);
         ColNumber = array.GetLength(1);
     }
@@ -74,5 +74,5 @@ public class Matrix
     }
 
     public override int GetHashCode() 
-        => HashCode.Combine(_content, ColNumber, RowNumber);
+        => HashCode.Combine(content, ColNumber, RowNumber);
 }
