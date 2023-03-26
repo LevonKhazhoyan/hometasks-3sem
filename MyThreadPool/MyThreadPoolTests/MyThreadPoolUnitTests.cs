@@ -11,7 +11,7 @@ public class Tests
 
     [SetUp]
     public void Setup()
-    => myTestThreadPool = new MyThreadPool(NumberOfThreads);
+        => myTestThreadPool = new MyThreadPool(NumberOfThreads);
     
 
     [OneTimeTearDown]
@@ -29,7 +29,7 @@ public class Tests
         var continuation = task.ContinueWith(value => value + 1);
         Assert.That(continuation.Result, Is.EqualTo(2));
     }
-    
+
     [Test]
     public void ContinueWithWorksAfterShutdown()
     {
@@ -41,14 +41,6 @@ public class Tests
         var continuation = task.ContinueWith(value => !value);
         myTestThreadPool.Shutdown();
         Assert.That(continuation.Result, Is.EqualTo(true));
-    }
-
-    [Test]
-    public void ContinueWithThrowExceptionAfterShutdown()
-    {
-        var task = myTestThreadPool.Submit(() => 1);
-        myTestThreadPool.Shutdown();
-        Assert.Throws<InvalidOperationException>(() => task.ContinueWith(value => value + 1));
     }
 
     [Test]
@@ -122,7 +114,7 @@ public class Tests
     }
 
     [Test]
-    public void ExceptionAfterShutdown()
+    public void SubmitLeadsToExceptionAfterShutdown()
     {
         myTestThreadPool.Shutdown();
         Assert.Throws<InvalidOperationException>(() => myTestThreadPool.Submit(() => 1));

@@ -1,5 +1,6 @@
 ﻿namespace MyThreadPool;
 
+using System.Reflection;
 using System.Collections.Concurrent;
 
 /// <summary>
@@ -62,7 +63,7 @@ public class MyThreadPool
             while (!tasksQueue.TryDequeue(out task) && !cancellationTokenFactory.IsCancellationRequested)
             {
                 queueBlocker.Reset();
-                queueBlocker.WaitOne();
+                queueBlocker.WaitOne(1000);
             }
 
             task?.Invoke();
@@ -111,10 +112,10 @@ public class MyThreadPool
     {
         private readonly ConcurrentQueue<Action> continuationQueue;
         private readonly MyThreadPool threadPool;
-        private AggregateException? exception;
+        private Exception? exception;
         private readonly ManualResetEvent getResultBlocker;
         private Func<TResult>? func;
-        private TResult? result;
+        private TResult result;
 
         /// <inheritdoc/>
         public bool IsCompleted => result != null;
@@ -126,9 +127,9 @@ public class MyThreadPool
             getResultBlocker = new ManualResetEvent(false);
             continuationQueue = new ConcurrentQueue<Action>();
         }
-        
+
         /// <inheritdoc/>
-        public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult?, TNewResult> continuation)
+        public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> continuation)
         {
             lock (threadPool.cancellationTokenFactory)
             {
@@ -149,7 +150,7 @@ public class MyThreadPool
         }
 
         /// <inheritdoc/>
-        public TResult? Result
+        public TResult Result
         {
             get
             {
@@ -162,7 +163,7 @@ public class MyThreadPool
                 return result;
             }
         }
-        
+
         /// <summary>
         /// Starts task
         /// </summary>
@@ -170,12 +171,16 @@ public class MyThreadPool
         {
             try
             {
+                if (func is null)
+                {
+                    throw new ArgumentNullException();
+                }
                 result = func();
                 func = null;
             }
-            catch (Exception e)
+            catch (TargetInvocationException e)
             {
-                exception = new AggregateException(e);
+                exception = e.InnerException;
             }
 
             getResultBlocker.Set();
