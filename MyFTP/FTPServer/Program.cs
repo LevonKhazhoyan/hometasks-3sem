@@ -6,9 +6,7 @@ if (args.Length < 2)
     return;
 }
 
-var ip = args[0];
-var port = int.Parse(args[1]);
-var server = new Server(ip, port);
+var server = new Server(args[0], int.Parse(args[1]));
 var startServer = server.StartAsync();
 Console.WriteLine("Press enter to stop");
 Console.ReadLine();

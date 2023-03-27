@@ -24,7 +24,7 @@ public class Tests
         _ = server.StartAsync();
     }
 
-    [OneTimeTearDown]
+    [TearDown]
     public void Teardown()
         => server.Shutdown();
 
@@ -52,9 +52,9 @@ public class Tests
         var file = await streamReader.ReadToEndAsync();
 
         await using var fileStream = File.OpenRead(filePath);
+        Assert.That(fileStream, Is.Not.Null);
         using var reader = new StreamReader(fileStream);
         var answerFile = await reader.ReadToEndAsync();
-
         Assert.That(answerFile, Is.EqualTo(file));
     }
 
