@@ -50,8 +50,9 @@ public class Tests
         await client.GetAsync(filePath, stream, cancellationToken.Token);
         using var streamReader = new StreamReader(stream);
         var file = await streamReader.ReadToEndAsync();
-
-        Assert.That(File.ReadAllText(filePath), Is.EqualTo(file));
+        
+        var answerFile = await File.ReadAllTextAsync(filePath);
+        Assert.That(answerFile, Is.EqualTo(file));
     }
 
     [TestCase(path)]
