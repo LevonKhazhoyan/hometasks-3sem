@@ -51,11 +51,7 @@ public class Tests
         using var streamReader = new StreamReader(stream);
         var file = await streamReader.ReadToEndAsync();
 
-        await using var fileStream = File.OpenRead(filePath);
-        Assert.That(fileStream, Is.Not.Null);
-        using var reader = new StreamReader(fileStream);
-        var answerFile = await reader.ReadToEndAsync();
-        Assert.That(answerFile, Is.EqualTo(file));
+        Assert.That(File.ReadAllText(filePath), Is.EqualTo(file));
     }
 
     [TestCase(path)]
