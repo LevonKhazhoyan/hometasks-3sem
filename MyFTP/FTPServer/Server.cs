@@ -8,7 +8,6 @@ using Domain;
 public class Server
 {
     private readonly CancellationTokenSource cancellationTokenSource = new();
-    private volatile int runningTasks;
     private readonly List<Task> tasks = new();
     private readonly TcpListener tcpListener;
     private readonly AutoResetEvent remainingTasksBlocker = new(false);
@@ -28,7 +27,6 @@ public class Server
     {
         using (client)
         {
-            Interlocked.Increment(ref runningTasks);
             await using var stream = client.GetStream();
             await using var writer = new StreamWriter(stream) {AutoFlush = true};
             using var reader = new StreamReader(stream);
@@ -48,7 +46,6 @@ public class Server
                         throw new ArgumentOutOfRangeException(nameof(Request.Type), "Invalid request type");
                 }
 
-                Interlocked.Decrement(ref runningTasks);
                 remainingTasksBlocker.Set();
             }
             catch (ArgumentNullException)
@@ -128,10 +125,7 @@ public class Server
     public void Shutdown()
     {
         cancellationTokenSource.Cancel();
-        while (runningTasks > 1)
-        {
-            remainingTasksBlocker.WaitOne();
-        }
+        Task.WaitAll();
         tcpListener.Stop();
     }
 }
