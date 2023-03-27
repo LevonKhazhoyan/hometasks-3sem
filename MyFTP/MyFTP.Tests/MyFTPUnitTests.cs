@@ -13,7 +13,7 @@ public class Tests
     private Server server;
     private readonly IPAddress ip = IPAddress.Parse("127.0.0.1");
     private const int port = 8888;
-    private const string path = "..\\..\\..\\TestData\\";
+    private const string path = "../../../TestData/";
     private readonly CancellationTokenSource cancellationToken = new();
 
     [SetUp]
@@ -43,7 +43,7 @@ public class Tests
     }
     
     [TestCase(path + "DonaldByrneVSBobbyFischer.txt")]
-    [TestCase(path + "TestDirectory\\KasparovVSDeepBlue№1.txt")]
+    [TestCase(path + "TestDirectory/KasparovVSDeepBlue№1.txt")]
     public async Task GetTest(string filePath)
     {
         using var stream = new MemoryStream();
@@ -59,7 +59,7 @@ public class Tests
     }
 
     [TestCase(path)]
-    [TestCase(path + "TestDirectory\\")]
+    [TestCase(path + "TestDirectory/")]
     public async Task ListTest(string filePath)
     {
         var directory = new DirectoryInfo(filePath);
