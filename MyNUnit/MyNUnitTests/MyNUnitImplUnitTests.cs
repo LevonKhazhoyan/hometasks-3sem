@@ -12,7 +12,7 @@ public class Tests
         return resultSet.SetEquals(testResultSet);
     }
 
-    [TestCase("..\\..\\..\\..\\MyNUnitTestProject\\bin")]
+    [TestCase("../../../../MyNUnitTestProject/bin")]
     public void Test(string path)
     {
         var result = new List<(string, ResultState)>
