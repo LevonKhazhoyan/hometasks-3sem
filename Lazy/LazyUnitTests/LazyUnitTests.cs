@@ -8,8 +8,8 @@ public class Tests
     [Test]
     public void SupplierCannotBeNull()
     {
-        Assert.Throws<ArgumentNullException>(() => LazyFactory.CreateLazy<object>(null));
-        Assert.Throws<ArgumentNullException>(() => LazyFactory.CreateConcurrentLazy<object>(null));
+        Assert.Throws<ArgumentNullException>(() => new Lazy.Lazy<object>(null));
+        Assert.Throws<ArgumentNullException>(() => new ConcurrentLazy<object>(null));
     }
 
     private static List<TestCaseData> Lazies()
@@ -18,8 +18,8 @@ public class Tests
 
         foreach (var item in TestData)
         {
-            testCaseData.Add(new TestCaseData(item, LazyFactory.CreateLazy(() => item)));
-            testCaseData.Add(new TestCaseData(item, LazyFactory.CreateConcurrentLazy(() => item)));
+            testCaseData.Add(new TestCaseData(item, new Lazy.Lazy<object>(() => item)));
+            testCaseData.Add(new TestCaseData(item, new ConcurrentLazy<object>(() => item)));
         }
 
         return testCaseData;
@@ -46,7 +46,7 @@ public class Tests
     {
         var counter = 0;
         var threads = new Thread[1000];
-        var lazy = LazyFactory.CreateConcurrentLazy(() => Interlocked.Increment(ref counter));
+        var lazy = new ConcurrentLazy<int>(() => Interlocked.Increment(ref counter));
 
         for (var i = 0; i < threads.Length; ++i)
         {
@@ -70,7 +70,7 @@ public class Tests
     public void LazyDoEvaluationOnce()
     {
         var counter = 0;
-        var lazy = LazyFactory.CreateLazy(() => Interlocked.Increment(ref counter));
+        var lazy = new Lazy.Lazy<int>(() => Interlocked.Increment(ref counter));
 
         for (var i = 0; i < 100; i++)
         {

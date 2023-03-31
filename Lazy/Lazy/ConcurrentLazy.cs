@@ -6,9 +6,9 @@
 /// <typeparam name="T"> Type of supplier result. </typeparam>
 public class ConcurrentLazy<T> : ILazy<T>
 {
-    private Func<T> supplier;
-    private readonly object myLock = new ();
-    private T result;
+    private Func<T>? supplier;
+    private readonly object myLock;
+    private T? result;
     private volatile bool isComputed;
 
     /// <summary>
@@ -17,25 +17,22 @@ public class ConcurrentLazy<T> : ILazy<T>
     /// <param name="supplier"> Function to evaluate. </param>
     /// <exception cref="ArgumentNullException"> Throws exception, when supplier is null. </exception>
     public ConcurrentLazy(Func<T> supplier)
-        => this.supplier = supplier ?? throw new ArgumentNullException(nameof(supplier));
+    {
+        this.supplier = supplier ?? throw new ArgumentNullException(nameof(supplier));
+        myLock = new object();
+        isComputed = false;
+    }
 
     /// <inheritdoc/>
-    public T Get()
+    public T? Get()
     {
-        if (isComputed)
-        {
-            return result;
-        }
-
+        if (isComputed) return result;
         lock (myLock)
         {
-            if (isComputed)
-            {
-                return result;
-            }
-            result = supplier();
-            supplier = null;
+            if (isComputed) return result;
+            result = supplier!();
             isComputed = true;
+            supplier = null;
         }
 
         return result;

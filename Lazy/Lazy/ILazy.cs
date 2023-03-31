@@ -10,5 +10,5 @@ public interface ILazy<out T>
     /// Calculate and return the value or return previously calculated one.
     /// </summary>
     /// <returns>Computation result.</returns>
-    T Get();
+    T? Get();
 }
