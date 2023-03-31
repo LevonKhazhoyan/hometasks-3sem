@@ -4,7 +4,7 @@ using MyNUnitAttributes.Attributes;
 
 public class PassingTests
 {
-    private static string myString;
+    private static string myString = "test string";
 
     [BeforeClass]
     public static void BeforeTests()

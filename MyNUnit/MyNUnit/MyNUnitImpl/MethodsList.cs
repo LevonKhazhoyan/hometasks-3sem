@@ -7,9 +7,9 @@ using System.Reflection;
 /// </summary>
 public class MethodsList
 {
-    public List<MethodInfo> After { get; } = new();
-    public List<MethodInfo> AfterClass { get; } = new();
-    public List<MethodInfo> Before { get; } = new();
-    public List<MethodInfo> BeforeClass { get; } = new();
-    public List<MethodInfo> Test { get; } = new();
+    public readonly List<MethodInfo> After = new();
+    public readonly List<MethodInfo> AfterClass  = new();
+    public readonly List<MethodInfo> Before  = new();
+    public readonly List<MethodInfo> BeforeClass = new();
+    public readonly List<MethodInfo> Test = new();
 }

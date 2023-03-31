@@ -36,14 +36,13 @@ public class MyNUnitClass
             switch (test.Result)
             {
                 case ResultState.Failed:
+                    break;
                 case ResultState.Passed:
                     Console.WriteLine($"Test named: \"{test.Name}\" {test.Result}. Total time of test session: {test.ElapsedTime.TotalMilliseconds} ms");
                     break;
                 case ResultState.Ignored:
                     Console.WriteLine($"Test name: \"{test.Name}\" Ignored. Reason: {test.IgnoreReason}. Total time of test session: {test.ElapsedTime.TotalMilliseconds} ms");
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
     }
@@ -66,7 +65,7 @@ public class MyNUnitClass
 
     private void ExecuteTest(MethodsList methods, Type testClass, MethodInfo test)
     {
-        if (!RunBeforeAfterTestMethod(methods.Before, testClass))
+        if (!RunBeforeAfterTestMethod(methods.Before, test))
         {
             ResultList.Add(new TestResult(test.Name, ResultState.Ignored, TimeSpan.Zero, "Before test method failed"));
             return;
@@ -79,7 +78,7 @@ public class MyNUnitClass
             return;
         }
 
-        ResultList.Add(!RunBeforeAfterTestMethod(methods.After, testClass)
+        ResultList.Add(!RunBeforeAfterTestMethod(methods.After, test)
             ? new TestResult(test.Name, ResultState.Failed, TimeSpan.Zero, null)
             : result);
     }
@@ -90,22 +89,23 @@ public class MyNUnitClass
     /// <param name="methods">Before or After class methods</param>
     /// <param name="tests">Test methods</param>
     /// <returns>Whether it's failed</returns>
-    private bool RunMethods(IEnumerable<MethodInfo> methods, List<MethodInfo> tests)
+    private bool RunMethods(List<MethodInfo> methods, List<MethodInfo> tests)
     {
         var result = true;
-        try
+        foreach (var method in methods)
         {
-            Parallel.ForEach(methods, method => method.Invoke(null, null));
-        }
-        catch (Exception)
-        {
-            foreach (var test in tests)
+            try
             {
-                ResultList.RemoveAll(item => item.Name == test.Name);
-                ResultList.Add(new TestResult(test.Name, ResultState.Ignored, TimeSpan.Zero,
-                    "Before or After class method failed"));
+                method.Invoke(null, null);
             }
-            result = false;
+            catch (TargetInvocationException)
+            {
+                foreach (var test in tests)
+                {
+                    ResultList.Add(new TestResult(test.Name, ResultState.Ignored, TimeSpan.Zero, "Before or After class method failed"));
+                }
+                result = false;
+            }
         }
         return result;
     }
@@ -135,7 +135,7 @@ public class MyNUnitClass
                 return new TestResult(method.Name, ResultState.Failed, stopwatch.Elapsed, null);
             }
         }
-        catch (Exception e)
+        catch (TargetInvocationException e)
         {
             stopwatch.Stop();
             if (properties?.Expected != null && e.InnerException?.GetType() != properties.Expected || properties?.Expected == null)
@@ -146,14 +146,13 @@ public class MyNUnitClass
         return new TestResult(method.Name, ResultState.Passed, stopwatch.Elapsed, null);
     }
 
-    private static bool RunBeforeAfterTestMethod(List<MethodInfo> methods, Type testClass)
+    private static bool RunBeforeAfterTestMethod(List<MethodInfo> methods, MethodInfo test)
     {
-        var testClassInstance = Activator.CreateInstance(testClass);
         foreach (var method in methods)
         {
             try
             {
-                method.Invoke(testClassInstance, null);
+                method.Invoke(test, null);
             }
             catch (Exception)
             {
@@ -174,6 +173,10 @@ public class MyNUnitClass
         {
             foreach (var attribute in Attribute.GetCustomAttributes(method))
             {
+                if (method.GetParameters().Length != 0)
+                {
+                    throw new InvalidOperationException("Test methods shouldn't have any parameters");
+                }
                 switch (attribute)
                 {
                     case Test:
@@ -188,20 +191,12 @@ public class MyNUnitClass
                         {
                             throw new InvalidOperationException("After test methods return type should be void");
                         }
-                        if (method.GetParameters().Length != 0)
-                        {
-                            throw new InvalidOperationException("After test methods shouldn't have any parameters");
-                        }
                         methodsList.After.Add(method);
                         break;
                     case Before:
                         if (method.ReturnType != typeof(void))
                         {
                             throw new InvalidOperationException("Before test methods return type should be void");
-                        }
-                        if (method.GetParameters().Length != 0)
-                        {
-                            throw new InvalidOperationException("Before test methods shouldn't have any parameters");
                         }
                         methodsList.Before.Add(method);
                         break;
