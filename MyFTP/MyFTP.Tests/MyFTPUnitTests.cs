@@ -19,9 +19,10 @@ public class Tests
     [SetUp]
     public void SetupAsync()
     {
-        server = new Server(ip, port);
+        server = new Server(port, ip);
         client = new Client(ip, port);
-        _ = server.StartAsync();
+        var task = server.StartAsync();
+        task.WaitAsync(new TimeSpan(0, 0, 5));
     }
 
     [TearDown]

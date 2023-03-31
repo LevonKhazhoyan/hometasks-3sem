@@ -56,7 +56,7 @@ public class Client
         
         if (countOfFiles == -1)
         {
-            throw new DirectoryNotFoundException();;
+            throw new DirectoryNotFoundException();
         }
         
         for (var i = 1; i <= 2 * countOfFiles; i += 2)

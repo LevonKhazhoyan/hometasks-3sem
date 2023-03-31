@@ -1,5 +1,8 @@
 ﻿namespace MyFTPServer.Domain;
 
+/// <summary>
+/// Class that represents FTP request
+/// </summary>
 public class Request
 {
     public RequestType Type { get; }

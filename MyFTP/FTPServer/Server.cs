@@ -12,11 +12,14 @@ public class Server
     private readonly TcpListener tcpListener;
     private readonly AutoResetEvent remainingTasksBlocker = new(false);
 
-    public Server(IPAddress ip, int port)
+    public Server(int port, IPAddress ip)
         => tcpListener = new TcpListener(ip, port);
 
-    public Server(string ip, int port)
+    public Server(int port, string ip)
         => tcpListener = new TcpListener(IPAddress.Parse(ip), port);
+
+    public Server(int port)
+        => tcpListener = new TcpListener(IPAddress.Any, port);
 
     /// <summary>
     /// Query processing method
@@ -31,27 +34,25 @@ public class Server
             await using var writer = new StreamWriter(stream) {AutoFlush = true};
             using var reader = new StreamReader(stream);
             var requestString = await reader.ReadLineAsync();
-            try
+            if (requestString == null)
             {
-                var request = ParseRequest(requestString!);
-                switch (request.Type)
-                {
-                    case RequestType.List:
-                        await ListAsync(request.Value, writer);
-                        break;
-                    case RequestType.Get:
-                        await GetAsync(request.Value, writer, token);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(Request.Type), "Invalid request type");
-                }
-
-                remainingTasksBlocker.Set();
+                await writer.WriteAsync("Input request string can't be null");
+                return;
             }
-            catch (ArgumentNullException)
+            var request = ParseRequest(requestString);
+            switch (request.Type)
             {
-                throw new ArgumentNullException(nameof(requestString), "Input string cannot be null");
+                case RequestType.List:
+                    await ListAsync(request.Value, writer);
+                    break;
+                case RequestType.Get:
+                    await GetAsync(request.Value, writer, token);
+                    break;
+                default:
+                    await writer.WriteAsync("Invalid request type");
+                    break;
             }
+            remainingTasksBlocker.Set();
         }
     }
  
@@ -72,13 +73,11 @@ public class Server
             }
             catch (OperationCanceledException)
             {
+                Task.WaitAll(tasks.ToArray());
+                tcpListener.Stop();
                 Console.WriteLine("Server disconnected");
-                return;
             }
         }
-
-        Task.WaitAll(tasks.ToArray());
-        tcpListener.Stop();
     }
     
     private static Request ParseRequest(string input)
@@ -125,7 +124,5 @@ public class Server
     public void Shutdown()
     {
         cancellationTokenSource.Cancel();
-        Task.WaitAll();
-        tcpListener.Stop();
     }
 }
