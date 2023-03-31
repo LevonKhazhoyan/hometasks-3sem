@@ -9,6 +9,9 @@ using System.Diagnostics;
 /// </summary>
 public class MyNUnitClass
 {
+    /// <summary>
+    /// List with result of the testing
+    /// </summary>
     public List<TestResult> ResultList { get; } = new();
 
     /// <summary>
